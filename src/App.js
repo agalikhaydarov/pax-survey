@@ -1,12 +1,6 @@
 import { useState } from "react";
 
-// ─── ВСТАВЬ СВОИ ДАННЫЕ ЗДЕСЬ ───────────────────────────────────────────────
-const T1 = "pat9ks5zJvz3Xo6vh";
-const T2 = ".abf5ec9f18cfb3e4e9e1e0942ea4d8032da4a9d2eb79796d6766469be3f31672";
-const AIRTABLE_TOKEN = T1 + T2;
-const AIRTABLE_BASE  = "appweX4l7UHT1EJJD";
 const AIRTABLE_TABLE = "Answers";
-// ────────────────────────────────────────────────────────────────────────────
 
 const ALL_STEPS = [
   {
@@ -20,16 +14,16 @@ const ALL_STEPS = [
   {
     id: "caregiver", block: "Ветка — уход за близким", title: "Расскажите подробнее", caregiver: true,
     questions: [
-      { id: "c_live",    type: "radio", text: "Вы живёте вместе с этим человеком?",                                          opts: ["Да","Нет, помогаю дистанционно"] },
-      { id: "c_control", type: "radio", text: "Как вы контролируете, что близкий принял лекарства?",                         opts: ["Звоню или пишу","Приезжаю","Никак, на доверии","PAX снял эту проблему"] },
-      { id: "c_before",  type: "radio", text: "До PAX случалось, что близкий принял не то или пропустил приём?",             opts: ["Да, несколько раз","Однажды было","Нет, не случалось"] },
+      { id: "c_live",    type: "radio", text: "Вы живёте вместе с этим человеком?",                                opts: ["Да","Нет, помогаю дистанционно"] },
+      { id: "c_control", type: "radio", text: "Как вы контролируете, что близкий принял лекарства?",               opts: ["Звоню или пишу","Приезжаю","Никак, на доверии","PAX снял эту проблему"] },
+      { id: "c_before",  type: "radio", text: "До PAX случалось, что близкий принял не то или пропустил приём?",   opts: ["Да, несколько раз","Однажды было","Нет, не случалось"] },
     ],
   },
   {
     id: "adherence", block: "Блок 1", title: "Приём лекарств", caregiver: false,
     questions: [
       { id: "skip",  type: "radio", textSelf: "Стали ли вы пропускать приёмы реже с PAX?", textCare: "Стал ли ваш близкий пропускать приёмы реже с PAX?", opts: ["Да, значительно реже","Да, немного реже","Примерно так же","Нет"] },
-      { id: "doubt", type: "radio", text: "Бывало ли, что вы смотрели на таблетки и думали: «я уже принял или нет?»",       opts: ["Да, регулярно","Иногда","Крайне редко","Нет, такого не было"] },
+      { id: "doubt", type: "radio", text: "Бывало ли, что вы смотрели на таблетки и думали: «я уже принял или нет?»", opts: ["Да, регулярно","Иногда","Крайне редко","Нет, такого не было"] },
     ],
   },
   {
@@ -43,8 +37,8 @@ const ALL_STEPS = [
   {
     id: "value", block: "Блок 3", title: "Ценность", caregiver: false,
     questions: [
-      { id: "main_value", type: "chip",  text: "Что для вас главное в PAX? (можно выбрать несколько)",      opts: ["Не путаюсь в схеме","Удобно брать с собой","Экономия времени","Спокойствие — всё правильно"] },
-      { id: "churn",      type: "radio", text: "Из-за чего вы могли бы не сделать следующий заказ?",        opts: ["Слишком дорого","Начну лучше справляться сам","Схема лечения изменится","Технические проблемы с заказом"] },
+      { id: "main_value", type: "chip",  text: "Что для вас главное в PAX? (можно выбрать несколько)", opts: ["Не путаюсь в схеме","Удобно брать с собой","Экономия времени","Спокойствие — всё правильно"] },
+      { id: "churn",      type: "radio", text: "Из-за чего вы могли бы не сделать следующий заказ?",   opts: ["Слишком дорого","Начну лучше справляться сам","Схема лечения изменится","Технические проблемы с заказом"] },
       { id: "nps",        type: "nps",   text: "Насколько вероятно, что вы порекомендуете PAX другу или знакомому?" },
     ],
   },
@@ -122,17 +116,11 @@ export default function Survey() {
     try {
       const fields = { ...answers };
       if (Array.isArray(fields.main_value)) fields.main_value = fields.main_value.join(", ");
-      const res = await fetch(
-        `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${AIRTABLE_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ fields }),
-        }
-      );
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fields }),
+      });
       if (!res.ok) throw new Error("error");
       setDone(true);
     } catch {
@@ -182,9 +170,7 @@ export default function Survey() {
           return (
             <div key={q.id} style={{ background:"#fff", borderRadius:14, border:"1px solid #C8DFEF", padding:"16px 18px", marginBottom:10 }}>
               <div style={{ fontSize:14, fontWeight:"500", color:"#0D3A52", marginBottom:12, lineHeight:1.5 }}>{text}</div>
-
               {q.type === "radio" && q.opts.map(o => <RadioOpt key={o} label={o} selected={answers[q.id]} onClick={v => set(q.id, v)} />)}
-
               {q.type === "chip" && (
                 <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
                   {q.opts.map(o => {
@@ -193,9 +179,7 @@ export default function Survey() {
                   })}
                 </div>
               )}
-
               {q.type === "nps" && <NPS value={answers[q.id]} onChange={v => set(q.id, v)} />}
-
               {q.type === "text" && (
                 <textarea rows={3} placeholder={q.placeholder} value={answers[q.id] || ""} onChange={e => set(q.id, e.target.value)}
                   style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid #C8DFEF", fontSize:13, color:"#0D3A52", fontFamily:"inherit", resize:"vertical", outline:"none", background:"#fff", lineHeight:1.5, boxSizing:"border-box" }} />
@@ -219,7 +203,7 @@ export default function Survey() {
           <button
             onClick={() => { if (step < total-1) setSt(s => s+1); else handleSubmit(); }}
             disabled={!isValid() || sending}
-            style={{ flex:1, padding:"11px 18px", borderRadius:10, border:"none", background:isValid()&&!sending?"#1A5F8C":"#C8DFEF", color:isValid()&&!sending?"#fff":"#9BBFD4", fontSize:13, fontWeight:"500", cursor:isValid()&&!sending?"pointer":"not-allowed", fontFamily:"inherit", transition:"background 0.2s" }}>
+            style={{ flex:1, padding:"11px 18px", borderRadius:10, border:"none", background:isValid()&&!sending?"#1A5F8C":"#C8DFEF", color:isValid()&&!sending?"#fff":"#9BBFD4", fontSize:13, fontWeight:"500", cursor:isValid()&&!sending?"pointer":"not-allowed", fontFamily:"inherit" }}>
             {sending ? "Отправляем..." : step === total-1 ? "Отправить ответы" : "Далее →"}
           </button>
         </div>
