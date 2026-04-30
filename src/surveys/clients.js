@@ -87,7 +87,7 @@ function NPS({ value, onChange }) {
   );
 }
 
-export default function Survey() {
+export default function Clients() {
   const [step, setSt] = useState(0);
   const [answers, setAnswers] = useState({});
   const [done, setDone] = useState(false);
@@ -120,10 +120,7 @@ export default function Survey() {
       if (fields.nps !== undefined) fields.nps = String(fields.nps);
       const res = await fetch(AT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": AT_KEY,
-        },
+        headers: { "Content-Type": "application/json", "Authorization": AT_KEY },
         body: JSON.stringify({ fields }),
       });
       if (!res.ok) throw new Error("error");
@@ -152,7 +149,7 @@ export default function Survey() {
       <div style={{ maxWidth:560, margin:"0 auto" }}>
         <div style={{ marginBottom:28 }}>
           <div style={{ fontSize:32, fontWeight:"700", color:"#0D3A52", letterSpacing:"-0.5px", lineHeight:1 }}>PAX</div>
-          <div style={{ fontSize:14, fontWeight:"600", color:"#5A8FAA", marginTop:6, lineHeight:1.4 }}>аптека с персональной упаковкой ваших лекарств</div>
+          <div style={{ fontSize:14, fontWeight:"600", color:"#5A8FAA", marginTop:6 }}>аптека с персональной упаковкой ваших лекарств</div>
         </div>
         <div style={{ height:3, background:"#C8DFEF", borderRadius:2, marginBottom:24 }}>
           <div style={{ height:"100%", width:`${pct}%`, background:"#1A5F8C", borderRadius:2, transition:"width 0.4s ease" }} />
@@ -187,27 +184,15 @@ export default function Survey() {
             </div>
           );
         })}
-        {error && (
-          <div style={{ fontSize:13, color:"#A32D2D", background:"#FCEBEB", borderRadius:10, padding:"10px 14px", marginTop:8 }}>
-            Не удалось отправить ответы. Проверьте соединение и попробуйте ещё раз.
-          </div>
-        )}
+        {error && <div style={{ fontSize:13, color:"#A32D2D", background:"#FCEBEB", borderRadius:10, padding:"10px 14px", marginTop:8 }}>Не удалось отправить ответы. Попробуйте ещё раз.</div>}
         <div style={{ display:"flex", gap:10, marginTop:12 }}>
-          {step > 0 && (
-            <button onClick={() => setSt(s => s-1)} style={{ padding:"11px 18px", borderRadius:10, border:"1px solid #C8DFEF", background:"transparent", color:"#5A8FAA", fontSize:13, fontWeight:"500", cursor:"pointer", fontFamily:"inherit" }}>
-              ← Назад
-            </button>
-          )}
-          <button
-            onClick={() => { if (step < total-1) setSt(s => s+1); else handleSubmit(); }}
-            disabled={!isValid() || sending}
+          {step > 0 && <button onClick={() => setSt(s => s-1)} style={{ padding:"11px 18px", borderRadius:10, border:"1px solid #C8DFEF", background:"transparent", color:"#5A8FAA", fontSize:13, fontWeight:"500", cursor:"pointer", fontFamily:"inherit" }}>← Назад</button>}
+          <button onClick={() => { if (step < total-1) setSt(s => s+1); else handleSubmit(); }} disabled={!isValid() || sending}
             style={{ flex:1, padding:"11px 18px", borderRadius:10, border:"none", background:isValid()&&!sending?"#1A5F8C":"#C8DFEF", color:isValid()&&!sending?"#fff":"#9BBFD4", fontSize:13, fontWeight:"500", cursor:isValid()&&!sending?"pointer":"not-allowed", fontFamily:"inherit" }}>
             {sending ? "Отправляем..." : step === total-1 ? "Отправить ответы" : "Далее →"}
           </button>
         </div>
-        <div style={{ textAlign:"center", fontSize:11, color:"#9BBFD4", marginTop:16 }}>
-          Ответы анонимны и используются только для улучшения сервиса
-        </div>
+        <div style={{ textAlign:"center", fontSize:11, color:"#9BBFD4", marginTop:16 }}>Ответы анонимны и используются только для улучшения сервиса</div>
       </div>
     </div>
   );
