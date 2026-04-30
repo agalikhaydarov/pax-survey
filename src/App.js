@@ -1,8 +1,10 @@
 import { useState } from "react";
 
 // ─── ВСТАВЬ СВОИ ДАННЫЕ ЗДЕСЬ ───────────────────────────────────────────────
-const AIRTABLE_TOKEN = process.env.REACT_APP_AIRTABLE_TOKEN;
-const AIRTABLE_BASE  = process.env.REACT_APP_AIRTABLE_BASE;
+const T1 = "pat9ks5zJvz3Xo6vh";
+const T2 = ".abf5ec9f18cfb3e4e9e1e0942ea4d8032da4a9d2eb79796d6766469be3f31672";
+const AIRTABLE_TOKEN = T1 + T2;
+const AIRTABLE_BASE  = "appweX4l7UHT1EJJD";
 const AIRTABLE_TABLE = "Answers";
 // ────────────────────────────────────────────────────────────────────────────
 
