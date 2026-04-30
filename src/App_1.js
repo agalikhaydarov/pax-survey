@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-const AIRTABLE_TABLE = "Answers";
+const AT_URL = "https://api.airtable.com/v0/appweX4l7UHT1EJJD/Answers";
+const AT_KEY = "Bearer pat9ks5zJvz3Xo6vh.abf5ec9f18cfb3e4e9e1e0942ea4d8032da4a9d2eb79796d6766469be3f31672";
 
 const ALL_STEPS = [
   {
@@ -14,9 +15,9 @@ const ALL_STEPS = [
   {
     id: "caregiver", block: "Ветка — уход за близким", title: "Расскажите подробнее", caregiver: true,
     questions: [
-      { id: "c_live",    type: "radio", text: "Вы живёте вместе с этим человеком?",                                opts: ["Да","Нет, помогаю дистанционно"] },
-      { id: "c_control", type: "radio", text: "Как вы контролируете, что близкий принял лекарства?",               opts: ["Звоню или пишу","Приезжаю","Никак, на доверии","PAX снял эту проблему"] },
-      { id: "c_before",  type: "radio", text: "До PAX случалось, что близкий принял не то или пропустил приём?",   opts: ["Да, несколько раз","Однажды было","Нет, не случалось"] },
+      { id: "c_live",    type: "radio", text: "Вы живёте вместе с этим человеком?",                              opts: ["Да","Нет, помогаю дистанционно"] },
+      { id: "c_control", type: "radio", text: "Как вы контролируете, что близкий принял лекарства?",             opts: ["Звоню или пишу","Приезжаю","Никак, на доверии","PAX снял эту проблему"] },
+      { id: "c_before",  type: "radio", text: "До PAX случалось, что близкий принял не то или пропустил приём?", opts: ["Да, несколько раз","Однажды было","Нет, не случалось"] },
     ],
   },
   {
@@ -116,9 +117,13 @@ export default function Survey() {
     try {
       const fields = { ...answers };
       if (Array.isArray(fields.main_value)) fields.main_value = fields.main_value.join(", ");
-      const res = await fetch("/api/submit", {
+      if (fields.nps !== undefined) fields.nps = String(fields.nps);
+      const res = await fetch(AT_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": AT_KEY,
+        },
         body: JSON.stringify({ fields }),
       });
       if (!res.ok) throw new Error("error");
@@ -145,26 +150,21 @@ export default function Survey() {
   return (
     <div style={{ minHeight:"100vh", background:"#EBF4FB", padding:"24px 16px 48px" }}>
       <div style={{ maxWidth:560, margin:"0 auto" }}>
-
         <div style={{ marginBottom:28 }}>
           <div style={{ fontSize:32, fontWeight:"700", color:"#0D3A52", letterSpacing:"-0.5px", lineHeight:1 }}>PAX</div>
           <div style={{ fontSize:14, fontWeight:"600", color:"#5A8FAA", marginTop:6, lineHeight:1.4 }}>аптека с персональной упаковкой ваших лекарств</div>
         </div>
-
         <div style={{ height:3, background:"#C8DFEF", borderRadius:2, marginBottom:24 }}>
           <div style={{ height:"100%", width:`${pct}%`, background:"#1A5F8C", borderRadius:2, transition:"width 0.4s ease" }} />
         </div>
-
         <div style={{ fontSize:11, color:"#9BBFD4", textAlign:"right", marginBottom:8 }}>Шаг {step+1} из {total}</div>
         <div style={{ fontSize:11, color:"#5A8FAA", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:4, fontWeight:"500" }}>{cur.block}</div>
         <div style={{ fontSize:20, fontWeight:"500", color:"#0D3A52", marginBottom:20 }}>{cur.title}</div>
-
         {cur.caregiver && (
           <div style={{ fontSize:12, color:"#5A8FAA", padding:"7px 12px", background:"#EBF4FB", borderRadius:8, borderLeft:"2px solid #7BBDE0", marginBottom:16 }}>
             → Этот блок — для тех, кто заботится о близком
           </div>
         )}
-
         {cur.questions.map(q => {
           const text = q.textSelf ? (isCaregiver && q.textCare ? q.textCare : q.textSelf) : q.text;
           return (
@@ -187,13 +187,11 @@ export default function Survey() {
             </div>
           );
         })}
-
         {error && (
           <div style={{ fontSize:13, color:"#A32D2D", background:"#FCEBEB", borderRadius:10, padding:"10px 14px", marginTop:8 }}>
             Не удалось отправить ответы. Проверьте соединение и попробуйте ещё раз.
           </div>
         )}
-
         <div style={{ display:"flex", gap:10, marginTop:12 }}>
           {step > 0 && (
             <button onClick={() => setSt(s => s-1)} style={{ padding:"11px 18px", borderRadius:10, border:"1px solid #C8DFEF", background:"transparent", color:"#5A8FAA", fontSize:13, fontWeight:"500", cursor:"pointer", fontFamily:"inherit" }}>
@@ -207,7 +205,6 @@ export default function Survey() {
             {sending ? "Отправляем..." : step === total-1 ? "Отправить ответы" : "Далее →"}
           </button>
         </div>
-
         <div style={{ textAlign:"center", fontSize:11, color:"#9BBFD4", marginTop:16 }}>
           Ответы анонимны и используются только для улучшения сервиса
         </div>
