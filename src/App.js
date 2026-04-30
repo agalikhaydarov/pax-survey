@@ -3,7 +3,7 @@ import { useState } from "react";
 // ─── ВСТАВЬ СВОИ ДАННЫЕ ЗДЕСЬ ───────────────────────────────────────────────
 const AIRTABLE_TOKEN = process.env.REACT_APP_AIRTABLE_TOKEN;
 const AIRTABLE_BASE  = process.env.REACT_APP_AIRTABLE_BASE;
-const AIRTABLE_TABLE = "Ответы";
+const AIRTABLE_TABLE = "Answers";
 // ────────────────────────────────────────────────────────────────────────────
 
 const ALL_STEPS = [
